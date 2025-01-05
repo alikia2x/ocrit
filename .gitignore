@@ -26,3 +26,5 @@ Tests/Private
 Design/Icon
 Build/
 MockServer/
+.build
+.vscode

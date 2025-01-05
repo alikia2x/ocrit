@@ -30,10 +30,9 @@ final class PDFOCROperation: OCROperation {
 
                         let ocr = CGImageOCR(image: cgImage, customLanguages: customLanguages)
 
-                        let text = try await ocr.run(fast: fast)
-
-                        let result = OCRResult(text: text, suggestedFilename: basename + "-\(page)")
-
+                        var result = try await ocr.run(fast: fast)
+                        result.suggestedFilename = basename + "-\(page)"
+                        
                         continuation.yield(result)
                     } catch {
                         /// Don't want to interrupt processing if a single page fails, so don't terminate the stream here.

@@ -1,7 +1,16 @@
 import Foundation
 
+struct OCRLine {
+    let text: String
+    let confidence: Double
+    let position: [Double]
+}
+
 struct OCRResult {
-    var text: String
+    var text: String {
+        lines.map { $0.text }.joined(separator: "\n")
+    }
+    var lines: [OCRLine]
     var suggestedFilename: String
 }
 

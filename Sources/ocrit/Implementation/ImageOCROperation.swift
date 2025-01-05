@@ -27,10 +27,9 @@ final class ImageOCROperation: OCROperation {
         return AsyncThrowingStream { continuation in
             Task {
                 do {
-                    let text = try await ocr.run(fast: fast)
-
-                    let result = OCRResult(text: text, suggestedFilename: filename)
-
+                    var result = try await ocr.run(fast: fast)
+                    result.suggestedFilename = filename
+                    
                     continuation.yield(result)
                     continuation.finish()
                 } catch {

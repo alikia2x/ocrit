@@ -1,6 +1,8 @@
 # ocrit
 
-Runs Vision's OCR on input images or PDF files and outputs corresponding `txt` files for each image, or writes the recognized results to standard output.
+The macOS native OCR CLI utility behind [OpenRewind](https://github.com/alikia2x/OpenRewind), forked from [insidegui/ocrit](https://github.com/insidegui/ocrit/).
+
+Compared to the original project, this modified version supports JSON output containing the coordinates and the confidence of the detected text, which provides a convenient way for other programs to be called.
 
 ```
 USAGE: ocrit [<image-paths> ...] [--output <output>] [--language <language> ...] [--fast]
@@ -9,7 +11,7 @@ ARGUMENTS:
   <image-paths>           Path or list of paths for the images
 
 OPTIONS:
-  -o, --output <output>   Path to a directory where the txt files will be written to, or - for standard output (default: -)
+  -o, --output <output>   Path to the output file (use .txt or .json extension), or - for standard output (default: stdOutput)
   -l, --language <language>
                           Language code to use for the recognition, can be repeated to select multiple languages
   -f, --fast              Uses an OCR algorithm that prioritizes speed over accuracy

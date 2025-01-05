@@ -17,7 +17,7 @@ struct ocrit: AsyncParsableCommand {
     var imagePaths: [Path]
 
     @Option(
-        name: .shortAndLong, help: "Path to a directory where the txt files will be written to, or - for standard output"
+        name: .shortAndLong, help: "Path to the output file (use .txt or .json extension), or - for standard output"
     )
     var output: Output = .stdOutput
 
@@ -29,10 +29,6 @@ struct ocrit: AsyncParsableCommand {
 
 
     func validate() throws {
-        if let path = output.path, !path.isDirectory {
-            throw ValidationError("Output path doesn't exist (or is not a directory) at \(output)")
-        }
-
         /// Validate languages before attempting any OCR operations so that we can exit early in case there's an unsupported language.
         try VNRecognizeTextRequest.validateLanguages(with: language)
     }
@@ -95,22 +91,10 @@ struct ocrit: AsyncParsableCommand {
     }
     
     private func writeResult(_ result: OCRResult, for imageURL: URL) throws {
-        guard let outputDirectoryURL = output.path?.url else {
-            print(imageURL.lastPathComponent + ":")
-            print(result.text + "\n")
-            return
+        let lines = result.lines.map {
+            (text: $0.text, confidence: $0.confidence, position: $0.position.map(Int.init))
         }
-        
-        var outputFileURL = outputDirectoryURL
-            .appendingPathComponent(result.suggestedFilename)
-            .appendingPathExtension("txt")
-        
-        try result.text.write(to: outputFileURL, atomically: true, encoding: .utf8)
-
-        if let attributes = try? imageURL.resourceValues(forKeys: [.creationDateKey, .contentModificationDateKey])
-        {
-            try outputFileURL.setResourceValues(attributes)
-        }
+        try output.write(lines)
     }
 }
 

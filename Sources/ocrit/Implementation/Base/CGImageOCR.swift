@@ -14,8 +14,8 @@ final class CGImageOCR {
     private var request: VNRecognizeTextRequest?
     private var handler: VNImageRequestHandler?
 
-    func run(fast: Bool) async throws -> String {
-        return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) -> Void in
+    func run(fast: Bool) async throws -> OCRResult {
+        return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<OCRResult, Error>) -> Void in
             performRequest(with: image, level: fast ? .fast : .accurate) { request, error in
                 if let error = error {
                     continuation.resume(throwing: error)
@@ -25,13 +25,34 @@ final class CGImageOCR {
                         return
                     }
 
-                    var transcript: String = ""
+                    var lines: [OCRLine] = []
+                    let imageWidth = Double(self.image.width)
+                    let imageHeight = Double(self.image.height)
+                    
                     for observation in observations {
-                        transcript.append(observation.topCandidates(1)[0].string)
-                        transcript.append("\n")
+                        let candidate = observation.topCandidates(1)[0]
+                        let boundingBox = observation.boundingBox
+                        
+                        // Convert normalized coordinates to pixel coordinates
+                        let x = boundingBox.origin.x * imageWidth
+                        let y = (1 - boundingBox.origin.y - boundingBox.size.height) * imageHeight
+                        let width = boundingBox.size.width * imageWidth
+                        let height = boundingBox.size.height * imageHeight
+                        
+                        let line = OCRLine(
+                            text: candidate.string,
+                            confidence: Double(candidate.confidence),
+                            position: [x, y, width, height]
+                        )
+                        lines.append(line)
                     }
 
-                    continuation.resume(with: .success(transcript))
+                    let result = OCRResult(
+                        lines: lines,
+                        suggestedFilename: "ocr_result"
+                    )
+                    
+                    continuation.resume(with: .success(result))
                 }
             }
         }

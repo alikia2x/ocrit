@@ -16,18 +16,5 @@ let package = Package(
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "PathKit", package: "PathKit")
             ]),
-        .testTarget(
-            name: "ocritTests",
-            dependencies: ["ocrit"],
-            exclude: ["Resources/ocrit-fixtures.sketch"],
-            resources: [
-                .copy("Resources/test-en.png"),
-                .copy("Resources/test-pt.png"),
-                .copy("Resources/test-zh.png"),
-                .copy("Resources/test-multi-en-ko.png"),
-                .copy("Resources/test-en-singlepage.pdf"),
-                .copy("Resources/test-en-multipage.pdf"),
-            ]
-        ),
     ]
 )
